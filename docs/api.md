@@ -94,7 +94,7 @@ curl http://10.42.251.2:8080/api/v1/score
     "12": {
         # service name : service info
         "fooserv": {
-            "checker": "OK",
+            "checker": "SUCCESS",
             "total": 632.7,
             "components": {
                 "attack": 432.7,
@@ -115,7 +115,7 @@ curl http://10.42.251.2:8080/api/v1/score?team=12&service=fooserv
 ```
 ```json
 {
-    "checker": "OK",
+    "checker": "SUCCESS",
     "total": 632.7,
     "components": {
         "attack": 432.7,
