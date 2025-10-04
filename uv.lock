@@ -185,7 +185,7 @@ wheels = [
 ]
 
 [[package]]
-name = "ecsc2025-wiki"
+name = "ecsc2025-ad-wiki"
 version = "0.1.0"
 source = { virtual = "." }
 dependencies = [
