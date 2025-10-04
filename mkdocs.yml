@@ -9,7 +9,7 @@ theme:
   logo: assets/logo.svg
   favicon: assets/favicon.svg
   palette:
-    scheme: slate # An optional dark mode scheme
+    scheme: slate
     primary: black
     accent: magenta
   custom_dir: overrides
@@ -26,7 +26,6 @@ nav:
   - Rules of Conduct: conduct.md
   - Cheatsheet: cheatsheet.md
   - Contact: contact.md
-    #- Changelog: changelog.md
 markdown_extensions:
   - abbr
   - attr_list
@@ -56,9 +55,6 @@ extra:
 extra_css:
   - https://unpkg.com/katex@0/dist/katex.min.css
   - assets/style.css
-#plugins:
-#  - print-site
-#  - to-pdf
 plugins:
   - search
   - git-revision-date
