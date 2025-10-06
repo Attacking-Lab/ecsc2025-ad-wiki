@@ -59,6 +59,9 @@
   --md-admonition-fg-color--info: var(--md-accent-fg-color);
   --md-admonition-bg-color--info: var(--md-default-bg-color);
 
+  --md-admonition-fg-color--question: var(--md-accent-fg-color);
+  --md-admonition-bg-color--question: var(--md-default-bg-color);
+
   --md-warning-fg-color: #000000de;
   --md-warning-bg-color: #ff9;
 
@@ -264,4 +267,41 @@
 
 .md-source {
 	color: white;
+}
+
+.hl-success > code {
+	color: #18d018;
+}
+
+.hl-recovering > code {
+	color: #54b1e8;
+}
+
+.hl-mumble > code {
+	color: #e1912a;
+}
+
+.hl-offline > code {
+	color: #c40c0c;
+}
+
+.hl-error > code {
+	color: #dddddd;
+}
+
+details.question {
+	border-color: var(--md-accent-fg-color) !important;
+	background-color: var(--md-admonition-bg-color) !important;
+}
+
+.question > summary {
+	background-color: #00b8d41a !important;
+}
+
+.question > summary::before {
+	background-color: var(--md-accent-fg-color) !important;
+}
+
+.question > summary::after {
+	background-color: var(--md-accent-fg-color) !important;
 }
