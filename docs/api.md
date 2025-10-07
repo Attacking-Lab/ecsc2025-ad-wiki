@@ -163,11 +163,13 @@ curl http://10.42.251.2:8080/api/v1/attack_info?service=fooserv
 ```
 ```json
 {
-    "12": {
-        "0": "target is 10cd9l7rt3",
-        "1": null
-    },
-    ..
+    "123": {
+        "12": {
+            "0": "target is 10cd9l7rt3",
+            "1": null
+        },
+        ..
+    }
 }
 ```
 </details>
