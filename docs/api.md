@@ -140,18 +140,21 @@ Example API usage:
 curl http://10.42.251.2:8080/api/v1/attack_info
 ```
 ```json
-{ # for current round id
-    # team id : team info
-    "12": {
-        # service name : service info
-        "fooserv": {
-            # flagstore id : attack info
-            "0": "target is 10cd9l7rt3",
-            "1": null
+{
+    # latest round with attack info : round info
+    "123": {
+        # team id : team info
+        "12": {
+            # service name : service info
+            "fooserv": {
+                # flagstore id : attack info
+                "0": "target is 10cd9l7rt3",
+                "1": null
+            },
+            ..
         },
         ..
-    },
-    ..
+    }
 }
 ```
 <div style=width:100%;height:1px;margin-top:-5px></div>
