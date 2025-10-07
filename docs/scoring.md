@@ -210,7 +210,7 @@ a flag is valid for.
 def sla(checker_status: str, flags_avail: int,
         base: int = 10, flag_rounds_valid: int = 5):
     if checker_status == "SUCCESS":
-        return base
+        return base * flagstores
     elif checker_status == "RECOVERING":
         return base * flags_avail / flag_rounds_valid
     else:
