@@ -17,8 +17,6 @@ that is still *valid* (submittable for points) and retrievable from the service,
 as long as the checker status is <span class=hl-success>`SUCCESS`</span>
 or <span class=hl-recovering>`RECOVERING`</span>.
 
-The total score is the sum of the **ATK**, **DEF** and **SLA** components.
-
 ## Checker Status
 
 The checker returns one of the following results for each service:
@@ -52,6 +50,11 @@ def jeopardy(teams: int, base: int = 10):
     return int(base * (30 / (29 + max(teams, 1))) ** 3)
 ```
 
+??? "Implementation Details"
+
+    - `teams`: The number of teams who have solved this *challenge*.
+    - `base`: The maximum number of points that can be earned through a *challenge*.
+
 The value of a challenge is close to `base` when the number of solving `teams`
 is low and close to zero when the number of solving teams is
 high. In this case, the value will drop down to 8% of `base` at 40 teams.
@@ -68,11 +71,46 @@ def attack(num_submissions: int):
     return jeopardy(num_submissions)
 ```
 
+??? "Implementation Details"
+
+    **Context**: This function is called per active <span class=hltext>attacker</span> and for every <span class=hltext>victim</span>, for each <span class=hltext>service</span> and <span class=hltext>flagstore</span> to calculate the value of the stolen <span class=hltext>flag</span>.
+
+    - `num_submissions`: The number of submissions of <span class=hltext>flag</span>.
+
 The scores of teams who have captured flags previously are updated to reflect
 the decreased value of those flags by new submissions.
 
 Since an attacker can exploit at most all active teams, which are neither
 themselves nor NOP (`max_victims`), the maximum gain from an exploit is `base * max_victims`.
+
+Additional ATK points are awarded to each attacking team based on the DEF points
+that other teams earn from defending against their attacks (more if the exploit is
+harder to defend against). This prevents scenarios where defenders gain more
+DEF points than the attacker can gain ATK points simply because the attacking team
+started attacking (in other words, failed exploit attempts do not affect the
+score difference between teams).
+
+```python3
+def attack_adj(live_round: int, flag_round: int,
+               max_victims: int, num_victims: int, num_attackers: int):
+    checker_status = defaultdict(lambda: "SUCCESS")
+    flag_avail_in = defaultdict(lambda: defaultdict(lambda: True))
+    pts = defense_scaled(live_round, flag_round, checker_status, flag_avail_in,
+                         max_victims, num_victims, num_attackers, True)
+    for flag in flags_stolen:
+        pts += attack(flag.num_submissions)
+    return pts
+```
+
+??? "Implementation Details"
+
+    **Context**: Each <span class=hltext>round</span>, this function is called per <span class=hltext>attack</span>, for the <span class=hltext>service</span> and <span class=hltext>flagstore</span> bein attacked by an <span class=hltext>attackers</span>, to calculate the value of the entire attack over all victims.
+
+    - `flag.num_submissions`: The number of submissions for the <span class=hltext>flag</span> of the current victim.
+    - `flags_stolen`: The flags stolen for this <span class=hltext>service</span> and <span class=hltext>flagstore</span> by the attacker that were deployed in `flag_round`.
+    - `max_victims`: The number of teams who are not the attacker or NOP, that have atleast one service not in <span class=hl-offline>`OFFLINE`</span> state in the current round.
+    - `num_victims`: The number of teams exploited by the attack which points are currently being calculated for.
+    - `num_attackers`: The number of teams attacking this <span class=hltext>service</span> and <span class=hltext>flagstore</span>, and obtaining flags stored in <span class=hltext>flag_round</span>.
 
 ### Defense Points
 
@@ -99,6 +137,15 @@ def defense(max_victims: int, num_victims: int,
     return jeopardy(max_victims - num_victims) * max_victims / num_attackers
 ```
 
+??? "Implementation Details"
+
+    **Context**: Each <span class=hltext>round</span>, this function is called per <span class=hltext>service</span> and <span class=hltext>flag store</span>, for each active <span class=hltext>attacker</span> and for every <span class=hltext>team</span>, to update the value of teams defending / not defending the <span class=hltext>attack</span>.
+
+    - `max_victims`: The number of teams who are not the attacker or NOP, that have atleast one service not in <span class=hl-offline>`OFFLINE`</span> state in the current round.
+    - `num_victims`: The number of teams exploited by the attack which points are currently being calculated for.
+    - `num_attackers`: The number of teams submitting flags from this <span class=hltext>service</span> and <span class=hltext>flag store</span> deployed in a specific <span class=hltext>round</span>.
+    - `exploited`: Is this <span class=hltext>team</span> currently being exploited?
+
 The defense points are scaled so that an ideal patch that blocks all
 active attackers does not gain more points than the attacker would from the
 exploit itself. When a patch blocks all attackers, it gains
@@ -114,33 +161,43 @@ gained for successful defending; if no flags are at risk, no reward is
 earned.
 
 ```python3
-def defense_scaled(live_tick: int, flag_tick: int,
-                   checker_status: dict[int, str], ...):
+def defense_scaled(live_round: int, flag_round: int, checker_status: dict[int, str],
+                   flag_avail_in: dict[int, dict[tuple[int, int, int, int], bool],
+                   max_victims: int, num_victims: int, num_attackers: int, exploited: bool,
+                   flag_rounds_valid: int = 5):
     pts = 0
-    max_tick = max(live_tick + 1, flag_tick + flag_rounds_valid)
-    for tick in range(flag_tick, max_tick):
-        if checker_status[tick] not in {"SUCCESS", "RECOVERING"}:
+    max_round = max(live_round + 1, flag_round + flag_rounds_valid)
+    for round in range(flag_round, max_round):
+        if checker_status[round] not in {"SUCCESS", "RECOVERING"}:
             continue
-        if flag_avail_in[tick][flag_tick, team, service, flagstore]:
-            pts += defense(...) / flag_rounds_valid
+        if flag_avail_in[round][flag_round, team, service, flagstore]:
+            pts += defense(max_victims, num_victims, num_attackers, exploited) \
+                   / flag_rounds_valid
     return pts
 ```
 
+??? "Implementation Details"
+
+    **Context**: Each <span class=hltext>round</span>, this function is called per <span class=hltext>service</span> and <span class=hltext>flag store</span>, for each active <span class=hltext>attacker</span> and for every <span class=hltext>team</span>, to update the value of teams defending / not defending the <span class=hltext>attack</span>.
+
+    - `live_round`: The round of the game in which the defense points are being updated.
+    - `flag_round`: The round of the game in which the flag being stolen was deployed.
+    - `checker_status`: The status of the checker for this service for each round of the game.
+    - `flag_avail_in`: A mapping for which flags were retrievable from a specific specific round (first key), depending on the team, service, flagstore and round they were deployed in. **Remember:** each round the checker checks that valid flags can be retrieved.
+    - `max_victims`: The number of teams who are not the attacker or NOP, that have atleast one service not in <span class=hl-offline>`OFFLINE`</span> state in the current round.
+    - `num_victims`: The number of teams exploited by the attack which points are currently being calculated for.
+    - `num_attackers`: The number of teams attacking this <span class=hltext>service</span> and <span class=hltext>flagstore</span>, and obtaining flags stored in <span class=hltext>flag_round</span>.
+    - `exploited`: Is this <span class=hltext>team</span> being exploited by the attack which points are currently being calculated for?
+    - `flag_rounds_valid`: The number of rounds each flag is valid for.
+
 Since defense points are recalculated for rounds in which still-valid flags
-were deployed, `max_tick` eventually reaches `flag_tick + flag_rounds_valid`.
+were deployed, `max_round` eventually reaches `flag_round + flag_rounds_valid`.
 
 At the end of the game, some flags need to be retained for fewer rounds. This
 means that protecting these flags earns proportionally fewer points over time,
 as there was also less time for other teams to capture them. However, the
 total number of flags you need to protect (and thus the defense points
 that can be earned in each round) does not change at the end of the game.
-
-Additional ATK points are awarded to each attacking team based on the DEF points
-that other teams earn from defending against their attacks (more if the exploit is
-harder to defend against). This prevents scenarios where defenders gain more
-DEF points than the attacker can gain ATK points simply because the attacking team
-started attacking (in other words, failed exploit attempts do not affect the
-score difference between teams).
 
 
 ### SLA Points
@@ -150,7 +207,8 @@ number of valid flags retrievable from a service and the number of rounds
 a flag is valid for.
 
 ```python3
-def sla(checker_status: str, flags_avail: int, base: int = 10):
+def sla(checker_status: str, flags_avail: int,
+        base: int = 10, flag_rounds_valid: int = 5):
     if checker_status == "SUCCESS":
         return base
     elif checker_status == "RECOVERING":
@@ -159,9 +217,22 @@ def sla(checker_status: str, flags_avail: int, base: int = 10):
         return 0
 ```
 
+??? "Implementation Details"
+
+    **Context**: Each <span class=hltext>round</span>, this function is called per <span class=hltext>team</span> and per <span class=hltext>service</span>.
+
+    - `checker_status`: The status returned by the checker for <span class=hltext>team</span> and <span class=hltext>service</span>.
+    - `flags_avail`: The number of flags available in the last 5 rounds from all flagstores of <span class=hltext>service</span> for <span class=hltext>team</span>.
+    - `base`: The maximum value of each *challenge*, see `jeopardy(..)` definition.
+    - `flag_rounds_valid`: The number of rounds each flag is valid for.
+
 This means that at the start of the CTF, SLA points ramp up from zero to `base`
 over the first five rounds, as the validity period is five rounds long.
 
+
+### Total Points
+
+The total score is the sum of the **ATK** (`attack_adj`), **DEF** (`defense_scaled`) and **SLA** (`sla`) components.
 
 ## Notes
 
@@ -179,6 +250,7 @@ over the first five rounds, as the validity period is five rounds long.
   from the attack traffic.
 - The maximum points gained from defending a flag store are never more than
   an exploiting team stands to gain.
+- The NOP team does not gain attack or defense points.
 
 ## Aggregated Scoring
 
@@ -193,7 +265,7 @@ points *in the same way*, and thus allow for fairer merging.
 The Jeopardy and A/D score are merged using the following formula from
 the handbook:
 
-```
+```python3
 ad_normalized_score = ad_score * (jeopardy_winner / ad_winner)
 aggregated_score = jeopardy_score + ad_normalized_score
 ```
@@ -207,7 +279,7 @@ To avoid SLA points from inflating `ad_score` before merging and thus
 devaluing Jeopardy challenges, we subtract the NOP team score in the
 final scoreboard.
 
-```
+```python3
 ad_score = max(0, ad_score_unadj - nop_score)
 ```
 
