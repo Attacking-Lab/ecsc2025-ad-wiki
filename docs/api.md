@@ -13,11 +13,15 @@ Data for a specific <code>service</code> may be queried through the
 use of URL parameters.<br>
 
 <div style=margin-top:1em>
+
 Example API usage:
+
 </div>
+
 ```sh
 curl http://10.42.251.2:8080/api/v1/services
 ```
+
 ```json
 {
     # service id : service info
@@ -29,9 +33,11 @@ curl http://10.42.251.2:8080/api/v1/services
 }
 ```
 <div style=width:100%;height:1px;margin-top:-4px></div>
+
 ```sh
 curl http://10.42.251.2:8080/api/v1/services?service=fooserv
 ```
+
 ```json
 {
     "name": "fooserv",
@@ -46,11 +52,15 @@ This endpoint returns team information, by default for all teams.
 Data for a specific <code>team</code> may be queried through the
 use of URL parameters.<br>
 <div style=margin-top:1em>
+
 Example API usage:
+
 </div>
+
 ```sh
 curl http://10.42.251.2:8080/api/v1/teams
 ```
+
 ```json
 {
     ..,
@@ -64,9 +74,11 @@ curl http://10.42.251.2:8080/api/v1/teams
 }
 ```
 <div style=width:100%;height:1px;margin-top:-5px></div>
+
 ```sh
 curl http://10.42.251.2:8080/api/v1/teams?team=2
 ```
+
 ```json
 {
     "name": "Team Europe",
@@ -83,11 +95,15 @@ current round. Data for a specific <code>round</code>, <code>team</code> and
 the use of URL parameters.<br>
 An example of a valid response:
 <div style=margin-top:1em>
+
 Example API usage:
+
 </div>
+
 ```sh
 curl http://10.42.251.2:8080/api/v1/score
 ```
+
 ```json
 { # for current round id
     # team id : team info
@@ -110,9 +126,11 @@ curl http://10.42.251.2:8080/api/v1/score
 }
 ```
 <div style=width:100%;height:1px;margin-top:-5px></div>
+
 ```sh
 curl http://10.42.251.2:8080/api/v1/score?team=12&service=fooserv
 ```
+
 ```json
 {
     "checker": "SUCCESS",
@@ -134,8 +152,11 @@ current round. Data for a specific <code>round</code>, <code>team</code>,
 <code>service</code> or <code>flagstore</code> may be queried through
 the use of URL parameters.<br>
 <div style=margin-top:1em>
+
 Example API usage:
+
 </div>
+
 ```sh
 curl http://10.42.251.2:8080/api/v1/attack_info
 ```
@@ -158,6 +179,7 @@ curl http://10.42.251.2:8080/api/v1/attack_info
 }
 ```
 <div style=width:100%;height:1px;margin-top:-5px></div>
+
 ```sh
 curl http://10.42.251.2:8080/api/v1/attack_info?service=fooserv
 ```
@@ -179,7 +201,9 @@ curl http://10.42.251.2:8080/api/v1/attack_info?service=fooserv
     UTC timestamp with second precision.
     If the game has not started, this endpoint will return round <code>0</code>.
     <div style=margin-top:1em>
+    
     Example API usage:
+
     ```sh
     curl http://10.42.251.2:8080/api/v1/current_round
     ```
@@ -196,7 +220,9 @@ curl http://10.42.251.2:8080/api/v1/attack_info?service=fooserv
     new round start time as an ISO-8601 UTC timestamp with second precision.
     The connection may timeout if the new round has not started after two rounds worth of time.<br>
     <div style=margin-top:1em>
+    
     Example API usage:
+    
     ```sh
     curl http://10.42.251.2:8080/api/v1/next_round
     ```
@@ -211,7 +237,9 @@ curl http://10.42.251.2:8080/api/v1/attack_info?service=fooserv
 <details class=simple><summary><code>/api/faustctf2024/teams.json</code> : Attack Info (FaustCTF 2024)</summary>
 This endpoint returns attack info in the FaustCTF 2024 <code>/teams.json</code> format.<br>
 <div style=margin-top:1em>
+
 Example API usage:
+
 ```sh
 curl http://10.42.251.2:8080/api/faustctf2024/teams.json
 ```
@@ -239,7 +267,9 @@ curl http://10.42.251.2:8080/api/faustctf2024/teams.json
 <details class=simple><summary><code>/api/saarctf2024/attack.json</code> : Attack Info (SaarCTF 2024)</summary>
 This endpoint returns attack info in the SaarCTF 2024 <code>/attack.json</code> format.
 <div style=margin-top:1em>
+
 Example API usage:
+
 ```sh
 curl http://10.42.251.2:8080/api/saarctf2024/attack.json
 ```

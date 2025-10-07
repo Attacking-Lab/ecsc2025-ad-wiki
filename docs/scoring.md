@@ -131,10 +131,11 @@ exploited, no teams receive DEF points.
 
 ```python3
 def defense(max_victims: int, num_victims: int,
-            num_attackers: int, exploited: bool):
+            num_attackers: int, exploited: bool,
+            exploiter_count: str):
     if exploited or num_victims == 0:
         return 0
-    return jeopardy(max_victims - num_victims) * max_victims / num_attackers
+    return jeopardy(max_victims - num_victims) * max_victims / num_attackers + eval(exploiter_count)
 ```
 
 ??? "Implementation Details"
