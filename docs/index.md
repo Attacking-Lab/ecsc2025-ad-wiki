@@ -25,9 +25,9 @@ The schedule for the day of the Attack-Defense CTF:<span style=width:1px;height:
 |:----------------:|------------------------------------------------------------------------------------|
 |    *earlier*     | Players receive credentials to the [platform](/platform) via the ECSC 2025 Discord |
 |      09:00       | Players can download wireguard configuration to access the game network            |
-|      09:30       | Players can start their vulnbox using the platform                                 |
+|      09:30       | Players can start their vulnbox and exploiter using the platform                   |
 |      10:00       | <span class=hltext>The Attack-Defense CTF officially begins</span>                 |
-|        -         | SSH access to vulnboxes is unblocked                                               |
+|        -         | SSH access to vulnboxes and exploiters is unblocked                                |
 |        -         | [API endpoints](/api#Firewall) are available to test connectivity                  |
 |        -         | Flag submission at `10.42.251.2:1337` accepts connections                          |
 |        -         | Scoreboard at `10.42.251.2` is available (empty)                                   |
